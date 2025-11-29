@@ -234,7 +234,30 @@ app.delete('/api/assignments/:id', (req, res) => {
 
 // DELETE 2: 전체 과제 삭제
 // - 성공: 200
+// - 데이터 없음: 404
+// - 유지보수 모드: 503
+
 app.delete('/api/assignments', (req, res) => {
+
+    // 유지보수 모드 테스트 (?maintenance=true)
+    if (req.query.maintenance === 'true') {
+        return sendError(
+            res,
+            503,
+            '현재 과제 관리 서비스가 점검 중입니다. 나중에 다시 시도해주세요.'
+        );
+    }
+
+    // 삭제할 데이터가 없는 경우
+    if (assignments.length === 0) {
+        return sendError(
+            res,
+            404,
+            '삭제할 과제가 없습니다.'
+        );
+    }
+
+    // 정상 삭제 처리
     const count = assignments.length;
     assignments = [];
 
